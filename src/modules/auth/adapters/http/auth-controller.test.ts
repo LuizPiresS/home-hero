@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
-import { createApp } from '../../src/main/app.js';
-import { InMemoryEmailVerificationSender } from '../../src/modules/auth/adapters/in-memory.js';
-import { ConsoleEmailVerificationSender } from '../../src/modules/auth/adapters/console-email-verification-sender.js';
+import { createApp } from '../../../../main/app.js';
+import { InMemoryEmailVerificationSender } from '../in-memory.js';
+import { ConsoleEmailVerificationSender } from '../console-email-verification-sender.js';
 
 describe('cadastro e autenticação', () => {
   it('cadastra um usuário com as duas roles e envia a validação de e-mail', async () => {
@@ -28,7 +28,6 @@ describe('cadastro e autenticação', () => {
 
     await request(app).post('/auth/register').send({ email: 'user@example.com', password: 'senha-segura', roles: ['contratante'] });
     const response = await request(app).post('/auth/login').send({ email: 'user@example.com', password: 'senha-segura' });
-
     const wrongPassword = await request(app).post('/auth/login').send({ email: 'user@example.com', password: 'senha-incorreta' });
 
     expect(response.status).toBe(401);
@@ -68,11 +67,7 @@ describe('cadastro e autenticação', () => {
   it('rejeita payloads de autenticação fora do schema', async () => {
     const app = createApp();
 
-    const invalidRegister = await request(app).post('/auth/register').send({
-      email: 'email-invalido',
-      password: 'curta',
-      roles: ['admin'],
-    });
+    const invalidRegister = await request(app).post('/auth/register').send({ email: 'email-invalido', password: 'curta', roles: ['admin'] });
     const invalidLogin = await request(app).post('/auth/login').send({ email: 'email-invalido' });
     const invalidVerification = await request(app).post('/auth/verify-email').send({ token: '' });
 

@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { createApp } from '../../src/main/app.js';
+import { createApp } from './app.js';
 
 describe('Home Hero API', () => {
   it('exposes the health endpoint with the configured service name', async () => {

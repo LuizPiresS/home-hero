@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EnvironmentConfigError, loadEnvironment } from '../../src/main/config/environment.js';
+import { EnvironmentConfigError, loadEnvironment } from './environment.js';
 
 describe('loadEnvironment', () => {
   it('requires DATABASE_URL before startup', () => {
