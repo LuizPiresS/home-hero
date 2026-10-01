@@ -43,22 +43,31 @@ Os adaptadores atuais de usuários e sessão são em memória para permitir o de
 
 - Node.js 20 ou superior
 - npm
-- PostgreSQL 15 ou superior
+- Docker com Docker Compose
 
 ## Instalação e execução
 
 ```bash
 npm install
 cp .env.example .env
+docker compose up -d postgres
+docker compose exec -T postgres psql -U postgres -d home_hero < migrations/001_create_users.sql
 npm run dev
 ```
 
-Crie o banco e aplique a migration antes de iniciar a API:
+O PostgreSQL de desenvolvimento roda no Docker Compose. Para verificar o container:
 
 ```bash
-createdb home_hero
-psql "$DATABASE_URL" -f migrations/001_create_users.sql
+docker compose ps
 ```
+
+Para parar o container mantendo os dados:
+
+```bash
+docker compose down
+```
+
+O volume `home-hero-postgres-data` mantém os dados entre reinícios. A migration deve ser aplicada explicitamente antes do primeiro uso.
 
 Por padrão, o servidor escuta na porta `3000`. A porta pode ser alterada com `PORT`.
 
