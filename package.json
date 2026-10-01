@@ -1,0 +1,26 @@
+{
+  "name": "home-hero-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API da plataforma Home Hero",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/main/server.ts",
+    "lint": "tsc --noEmit -p tsconfig.json",
+    "start": "node dist/main/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "supertest": "^7.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.4"
+  }
+}
