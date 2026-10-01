@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "profile": "backend",
+  "agentTarget": "codex",
+  "validations": [],
+  "agentWorkflow": [
+    "aops context",
+    "aops next"
+  ],
+  "clientActions": [
+    "aops login",
+    "aops configure --write --project-id <project-id>"
+  ],
+  "approvalRequired": [
+    "secrets",
+    "architecture publication",
+    "harness plan application",
+    "deploy"
+  ]
+}

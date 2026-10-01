@@ -1,0 +1,24 @@
+{
+  "requiredValidations": [],
+  "validationProfiles": {
+    "documentation": [
+      "git diff --check"
+    ],
+    "low-risk": [],
+    "behavior": [],
+    "critical": []
+  },
+  "workflow": {
+    "blockOnActionableRisks": true,
+    "blockOnBlockedRisks": false,
+    "blockOnOpenPriorities": [
+      "urgent",
+      "high",
+      "normal",
+      "low"
+    ],
+    "requireSpecForNonTrivialChanges": true,
+    "requireFeatureValidation": true,
+    "requireRemoteState": true
+  }
+}
