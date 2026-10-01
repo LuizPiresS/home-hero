@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "db:migrate": "tsx src/main/database/migrate-command.ts",
     "dev": "tsx watch src/main/server.ts",
     "lint": "tsc --noEmit -p tsconfig.json",
     "start": "node dist/main/server.js",

@@ -51,7 +51,7 @@ Os adaptadores atuais de usuários e sessão são em memória para permitir o de
 npm install
 cp .env.example .env
 docker compose up -d postgres
-docker compose exec -T postgres psql -U postgres -d home_hero < migrations/001_create_users.sql
+npm run db:migrate
 npm run dev
 ```
 
@@ -67,7 +67,9 @@ Para parar o container mantendo os dados:
 docker compose down
 ```
 
-O volume `home-hero-postgres-data` mantém os dados entre reinícios. A migration deve ser aplicada explicitamente antes do primeiro uso.
+O volume `home-hero-postgres-data` mantém os dados entre reinícios. O comando `npm run db:migrate` cria a tabela de controle e aplica somente migrations pendentes.
+
+Cada arquivo SQL deve seguir o padrão `NNN_descricao.sql`. As migrations são executadas em ordem numérica, dentro de transação e com lock advisory do PostgreSQL. O checksum impede que uma migration já aplicada seja alterada; nesse caso, crie uma nova migration.
 
 Por padrão, o servidor escuta na porta `3000`. A porta pode ser alterada com `PORT`.
 
