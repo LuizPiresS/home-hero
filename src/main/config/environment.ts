@@ -18,6 +18,8 @@ export class EnvironmentConfigError extends Error {
   }
 }
 
+// Esta é a única porta de entrada das configurações externas da aplicação.
+// Falhar aqui é preferível a iniciar com valores parcialmente inválidos.
 export const loadEnvironment = (environment: NodeJS.ProcessEnv): AppEnvironment => {
   const result = environmentSchema.safeParse(environment);
 

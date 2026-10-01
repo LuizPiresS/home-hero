@@ -5,6 +5,7 @@ import type { User, UserRole } from '../domain/user.js';
 
 const scrypt = promisify(scryptCallback);
 
+// Este repositório é útil para testes e exemplos, mas não deve ser usado como persistência de produção.
 export class InMemoryUserRepository implements UserRepository {
   private readonly users = new Map<string, User>();
 
@@ -27,6 +28,7 @@ export class InMemoryUserRepository implements UserRepository {
 
 export class ScryptPasswordHasher implements PasswordHasher {
   async hash(password: string): Promise<string> {
+    // Cada senha recebe um salt novo; o salt é armazenado junto do hash para permitir a comparação.
     const salt = randomBytes(16).toString('hex');
     const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
     return `${salt}:${derivedKey.toString('hex')}`;
@@ -37,12 +39,14 @@ export class ScryptPasswordHasher implements PasswordHasher {
     if (!salt || !expected) return false;
     const actual = (await scrypt(password, salt, 64)) as Buffer;
     const expectedBuffer = Buffer.from(expected, 'hex');
+    // timingSafeEqual evita comparações que revelem diferenças pelo tempo de execução.
     return expectedBuffer.length === actual.length && timingSafeEqual(actual, expectedBuffer);
   }
 }
 
 export class RandomTokenGenerator implements TokenGenerator {
   generate(): string {
+    // randomBytes é um gerador criptograficamente seguro fornecido pelo Node.js.
     return randomBytes(32).toString('hex');
   }
 }
@@ -57,6 +61,7 @@ export class InMemoryEmailVerificationSender implements EmailVerificationSender 
   readonly messages: Array<{ email: string; token: string }> = [];
 
   async sendVerificationEmail(input: { email: string; token: string }): Promise<void> {
+    // Em vez de chamar um provedor externo, guardamos a mensagem para asserções nos testes.
     this.messages.push(input);
   }
 }
@@ -65,6 +70,7 @@ export class InMemoryAccessTokenIssuer implements AccessTokenIssuer {
   readonly sessions = new Map<string, { userId: string; roles: UserRole[] }>();
 
   async issue(input: { userId: string; roles: UserRole[] }): Promise<string> {
+    // A sessão em memória é somente uma implementação provisória para desenvolvimento/testes.
     const token = randomBytes(32).toString('hex');
     this.sessions.set(token, input);
     return token;

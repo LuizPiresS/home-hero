@@ -13,6 +13,7 @@ type UserRow = {
   createdAt: Date;
 };
 
+// Este adaptador converte a porta de persistência em consultas parametrizadas do PostgreSQL.
 export class PostgresUserRepository implements UserRepository {
   constructor(private readonly database: Pick<Pool, 'query'>) {}
 
@@ -27,6 +28,7 @@ export class PostgresUserRepository implements UserRepository {
   }
 
   async save(user: User): Promise<void> {
+    // Os valores são passados separadamente para evitar interpolação de dados no SQL.
     await this.database.query(
       `INSERT INTO users (
         id, email, password_hash, roles, email_verified_at,
@@ -52,6 +54,7 @@ export class PostgresUserRepository implements UserRepository {
 }
 
 const userSelect = (condition: string): string =>
+  // A projeção explicita os aliases usados pelo domínio e evita vazar nomes SQL para a aplicação.
   `SELECT id, email, password_hash AS "passwordHash", roles,
           email_verified_at AS "emailVerifiedAt",
           verification_token_hash AS "verificationTokenHash",

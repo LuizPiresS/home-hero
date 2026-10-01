@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { USER_ROLES } from '../domain/user.js';
 
+// Schemas validam dados na fronteira antes que eles alcancem as regras de negócio.
 export const registerUserSchema = z.object({
   email: z.string().trim().email().transform((email) => email.toLowerCase()),
   password: z.string().min(8),
@@ -8,6 +9,7 @@ export const registerUserSchema = z.object({
 });
 
 export const loginUserSchema = z.object({
+  // O login usa o mesmo formato de erro para não permitir enumeração de contas.
   email: z.string().trim().email().transform((email) => email.toLowerCase()),
   password: z.string(),
 });

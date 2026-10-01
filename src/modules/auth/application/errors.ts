@@ -1,4 +1,5 @@
 export class AuthError extends Error {
+  // Erros de aplicação têm códigos estáveis para o adaptador HTTP traduzir em status/resposta.
   constructor(
     public readonly code:
       | 'INVALID_INPUT'

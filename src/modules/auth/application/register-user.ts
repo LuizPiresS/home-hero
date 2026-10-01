@@ -26,6 +26,7 @@ export const createRegisterUser = (dependencies: {
   emailVerificationSender: EmailVerificationSender;
   clock: Clock;
 }) => async (input: unknown): Promise<RegisterUserOutput> => {
+  // Validar o payload aqui protege o caso de uso mesmo quando ele é chamado sem HTTP.
   const parsed = registerUserSchema.safeParse(input);
   if (!parsed.success) {
     throw new AuthError('INVALID_INPUT', 'email, senha e roles válidos são obrigatórios');
@@ -38,6 +39,9 @@ export const createRegisterUser = (dependencies: {
 
   const token = dependencies.tokenGenerator.generate();
   const now = dependencies.clock.now();
+
+  // O token original é enviado por e-mail, mas apenas seu hash é persistido.
+  // Assim, um vazamento do banco não revela diretamente tokens válidos.
   const user: User = {
     id: randomUUID(),
     email,
@@ -56,4 +60,5 @@ export const createRegisterUser = (dependencies: {
 };
 
 export const hashVerificationToken = (token: string): string =>
+  // SHA-256 é usado para localizar o token efêmero; a senha usa scrypt separadamente.
   createHash('sha256').update(token).digest('hex');

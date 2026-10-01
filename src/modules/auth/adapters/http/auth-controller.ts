@@ -9,10 +9,12 @@ export const createAuthController = (useCases: {
   loginUser: ReturnType<typeof createLoginUser>;
 }) => ({
   register: async (request: Request, response: Response): Promise<void> => {
+    // O controller extrai o body e devolve o resultado; validação e regras ficam na aplicação.
     const result = await useCases.registerUser(request.body);
     response.status(201).json(result);
   },
   verifyEmail: async (request: Request, response: Response): Promise<void> => {
+    // O token é o único dado necessário para confirmar o endereço.
     const result = await useCases.verifyEmail(request.body?.token);
     response.status(200).json(result);
   },

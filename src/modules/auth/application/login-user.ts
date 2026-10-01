@@ -7,12 +7,15 @@ export const createLoginUser = (dependencies: {
   passwordHasher: PasswordHasher;
   accessTokenIssuer: AccessTokenIssuer;
 }) => async (input: { email: unknown; password: unknown }) => {
+  // O schema também é aplicado fora do controller para manter o caso de uso seguro e reutilizável.
   const parsed = loginUserSchema.safeParse(input);
   if (!parsed.success) {
     throw new AuthError('INVALID_CREDENTIALS', 'e-mail ou senha inválidos');
   }
 
   const user = await dependencies.userRepository.findByEmail(parsed.data.email);
+  // O mesmo erro é usado para usuário inexistente, senha errada e e-mail não confirmado.
+  // Isso evita que a API revele quais contas existem.
   if (!user || !(await dependencies.passwordHasher.compare(parsed.data.password, user.passwordHash))) {
     throw new AuthError('INVALID_CREDENTIALS', 'e-mail ou senha inválidos');
   }

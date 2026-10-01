@@ -19,8 +19,12 @@ export type AppDependencies = {
   clock?: Clock;
 };
 
+// A fábrica recebe as dependências para manter a aplicação testável.
+// Em produção, o servidor injeta o PostgreSQL; nos testes, usamos adaptadores em memória.
 export const createApp = (dependencies: AppDependencies = {}): Express => {
   const app = express();
+
+  // O caso de uso não conhece Express. Esta composição conecta o domínio aos adaptadores concretos.
   const healthCheck = createHealthCheck(dependencies.serviceName ?? 'home-hero-api');
   const userRepository = dependencies.userRepository ?? new InMemoryUserRepository();
   const passwordHasher = dependencies.passwordHasher ?? new ScryptPasswordHasher();
@@ -28,12 +32,15 @@ export const createApp = (dependencies: AppDependencies = {}): Express => {
   const emailVerificationSender = dependencies.emailVerificationSender ?? new InMemoryEmailVerificationSender();
   const accessTokenIssuer = dependencies.accessTokenIssuer ?? new InMemoryAccessTokenIssuer();
   const clock = dependencies.clock ?? new SystemClock();
+
+  // Os casos de uso recebem apenas portas, nunca dependem diretamente de banco ou framework HTTP.
   const authController = createAuthController({
     registerUser: createRegisterUser({ userRepository, passwordHasher, tokenGenerator, emailVerificationSender, clock }),
     verifyEmail: createVerifyEmail({ userRepository, clock }),
     loginUser: createLoginUser({ userRepository, passwordHasher, accessTokenIssuer }),
   });
 
+  // A ordem dos middlewares importa: JSON e rotas vêm antes do tratamento centralizado de erros.
   app.disable('x-powered-by');
   app.use(express.json());
   app.use(createRoutes(healthCheck, authController));
