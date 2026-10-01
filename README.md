@@ -37,7 +37,7 @@ Atualmente a API possui:
 - bloqueio do primeiro login até a confirmação do e-mail;
 - emissão de token de acesso em memória após o login.
 
-Os adaptadores atuais de usuários, e-mail e sessão são em memória para permitir o desenvolvimento inicial. Os dados são perdidos ao reiniciar a aplicação e ainda devem ser substituídos por banco de dados, fila de e-mails e mecanismo de sessão/token de produção.
+Os adaptadores atuais de usuários e sessão são em memória para permitir o desenvolvimento inicial. Em `NODE_ENV=development`, o envio de validação de e-mail é simulado pelo `ConsoleEmailVerificationSender` e exibido no terminal como JSON. Os dados são perdidos ao reiniciar a aplicação e ainda devem ser substituídos por banco de dados, fila de e-mails e mecanismo de sessão/token de produção.
 
 ## Requisitos
 
@@ -147,7 +147,13 @@ Payload:
 }
 ```
 
-O token é de uso único e expira após 24 horas. Em produção, ele será enviado por um serviço de e-mail através de uma fila. No adaptador atual, o envio fica disponível no `InMemoryEmailVerificationSender` para testes e desenvolvimento.
+O token é de uso único e expira após 24 horas. Em desenvolvimento, o envio aparece no terminal. Por exemplo:
+
+```text
+{"type":"email.verification.sent","to":"pessoa@example.com","subject":"Confirme seu e-mail na Home Hero","token":"..."}
+```
+
+Copie o valor de `token` e use-o no endpoint `/auth/verify-email`. Em produção, esse adaptador deverá ser substituído por um serviço de e-mail através de uma fila.
 
 ### Login
 

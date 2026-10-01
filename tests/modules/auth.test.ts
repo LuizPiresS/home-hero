@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../../src/main/app.js';
 import { InMemoryEmailVerificationSender } from '../../src/modules/auth/adapters/in-memory.js';
+import { ConsoleEmailVerificationSender } from '../../src/modules/auth/adapters/console-email-verification-sender.js';
 
 describe('cadastro e autenticação', () => {
   it('cadastra um usuário com as duas roles e envia a validação de e-mail', async () => {
@@ -77,5 +78,19 @@ describe('cadastro e autenticação', () => {
     expect(invalidLogin.body.error).toBe('INVALID_CREDENTIALS');
     expect(invalidVerification.status).toBe(401);
     expect(invalidVerification.body.error).toBe('INVALID_VERIFICATION_TOKEN');
+  });
+
+  it('simula o envio do e-mail no console durante o desenvolvimento', async () => {
+    const messages: string[] = [];
+    const sender = new ConsoleEmailVerificationSender({ log: (message) => messages.push(message) });
+
+    await sender.sendVerificationEmail({ email: 'pessoa@example.com', token: 'token-de-teste' });
+
+    expect(JSON.parse(messages[0] ?? '')).toEqual({
+      type: 'email.verification.sent',
+      to: 'pessoa@example.com',
+      subject: 'Confirme seu e-mail na Home Hero',
+      token: 'token-de-teste',
+    });
   });
 });
