@@ -52,6 +52,15 @@ npm run dev
 
 Por padrão, o servidor escuta na porta `3000`. A porta pode ser alterada com `PORT`.
 
+Antes de criar o servidor, a aplicação valida todas as variáveis de ambiente próprias da plataforma. Se uma variável estiver inválida, o processo falha imediatamente com uma mensagem indicando o problema e nenhum listener HTTP é iniciado.
+
+Variáveis suportadas:
+
+| Variável | Obrigatória | Valores | Default |
+| --- | --- | --- | --- |
+| `PORT` | Não | inteiro entre `1` e `65535` | `3000` |
+| `NODE_ENV` | Não | `development`, `test` ou `production` | `development` |
+
 Para executar a versão compilada:
 
 ```bash
