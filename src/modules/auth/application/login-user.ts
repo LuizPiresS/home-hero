@@ -1,18 +1,19 @@
 import { AuthError } from './errors.js';
 import type { AccessTokenIssuer, PasswordHasher, UserRepository } from './ports.js';
-import { normalizeEmail } from '../domain/user.js';
+import { loginUserSchema } from './schemas.js';
 
 export const createLoginUser = (dependencies: {
   userRepository: UserRepository;
   passwordHasher: PasswordHasher;
   accessTokenIssuer: AccessTokenIssuer;
 }) => async (input: { email: unknown; password: unknown }) => {
-  if (typeof input.email !== 'string' || typeof input.password !== 'string') {
+  const parsed = loginUserSchema.safeParse(input);
+  if (!parsed.success) {
     throw new AuthError('INVALID_CREDENTIALS', 'e-mail ou senha inválidos');
   }
 
-  const user = await dependencies.userRepository.findByEmail(normalizeEmail(input.email));
-  if (!user || !(await dependencies.passwordHasher.compare(input.password, user.passwordHash))) {
+  const user = await dependencies.userRepository.findByEmail(parsed.data.email);
+  if (!user || !(await dependencies.passwordHasher.compare(parsed.data.password, user.passwordHash))) {
     throw new AuthError('INVALID_CREDENTIALS', 'e-mail ou senha inválidos');
   }
   if (!user.emailVerifiedAt) {

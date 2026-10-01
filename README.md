@@ -4,6 +4,8 @@ Plataforma de intermediação entre contratantes e profissionais liberais. A Hom
 
 Este repositório contém a API da plataforma, construída com TypeScript, Express e arquitetura hexagonal.
 
+A validação de dados nas fronteiras da aplicação utiliza [Zod](https://zod.dev/), incluindo ambiente, cadastro, login e confirmação de e-mail.
+
 ## Visão do produto
 
 A plataforma conecta dois tipos de atuação:

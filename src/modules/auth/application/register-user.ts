@@ -7,15 +7,10 @@ import type {
   TokenGenerator,
   UserRepository,
 } from './ports.js';
-import { isUserRole, normalizeEmail, type User, type UserRole } from '../domain/user.js';
+import type { User, UserRole } from '../domain/user.js';
+import { registerUserSchema } from './schemas.js';
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
-
-export type RegisterUserInput = {
-  email: string;
-  password: string;
-  roles: unknown;
-};
 
 export type RegisterUserOutput = {
   id: string;
@@ -30,13 +25,12 @@ export const createRegisterUser = (dependencies: {
   tokenGenerator: TokenGenerator;
   emailVerificationSender: EmailVerificationSender;
   clock: Clock;
-}) => async (input: RegisterUserInput): Promise<RegisterUserOutput> => {
-  const email = typeof input.email === 'string' ? normalizeEmail(input.email) : '';
-  const roles = normalizeRoles(input.roles);
-
-  if (!email || !email.includes('@') || typeof input.password !== 'string' || input.password.length < 8 || !roles) {
+}) => async (input: unknown): Promise<RegisterUserOutput> => {
+  const parsed = registerUserSchema.safeParse(input);
+  if (!parsed.success) {
     throw new AuthError('INVALID_INPUT', 'email, senha e roles válidos são obrigatórios');
   }
+  const { email, password, roles } = parsed.data;
 
   if (await dependencies.userRepository.findByEmail(email)) {
     throw new AuthError('EMAIL_ALREADY_REGISTERED', 'e-mail já cadastrado');
@@ -47,7 +41,7 @@ export const createRegisterUser = (dependencies: {
   const user: User = {
     id: randomUUID(),
     email,
-    passwordHash: await dependencies.passwordHasher.hash(input.password),
+    passwordHash: await dependencies.passwordHasher.hash(password),
     roles,
     emailVerifiedAt: null,
     verificationTokenHash: hashVerificationToken(token),
@@ -63,11 +57,3 @@ export const createRegisterUser = (dependencies: {
 
 export const hashVerificationToken = (token: string): string =>
   createHash('sha256').update(token).digest('hex');
-
-const normalizeRoles = (value: unknown): UserRole[] | null => {
-  if (!Array.isArray(value) || value.length === 0 || value.some((role) => !isUserRole(role))) {
-    return null;
-  }
-
-  return [...new Set(value)] as UserRole[];
-};

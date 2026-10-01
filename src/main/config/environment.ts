@@ -1,4 +1,7 @@
-export const NODE_ENV_VALUES = ['development', 'test', 'production'] as const;
+import { ZodError } from 'zod';
+import { environmentSchema, NODE_ENV_VALUES } from './environment-schema.js';
+
+export { NODE_ENV_VALUES } from './environment-schema.js';
 
 export type NodeEnvironment = (typeof NODE_ENV_VALUES)[number];
 
@@ -15,35 +18,26 @@ export class EnvironmentConfigError extends Error {
 }
 
 export const loadEnvironment = (environment: NodeJS.ProcessEnv): AppEnvironment => {
-  const issues: string[] = [];
-  const port = parsePort(environment.PORT, issues);
-  const nodeEnv = parseNodeEnvironment(environment.NODE_ENV, issues);
+  const result = environmentSchema.safeParse(environment);
 
-  if (issues.length > 0 || !nodeEnv) {
-    throw new EnvironmentConfigError(issues);
+  if (!result.success) {
+    throw new EnvironmentConfigError(toEnvironmentIssues(result.error));
   }
 
-  return { port, nodeEnv };
+  return result.data;
 };
 
-const parsePort = (value: string | undefined, issues: string[]): number => {
-  const rawValue = value ?? '3000';
-  const port = Number(rawValue);
+const toEnvironmentIssues = (error: ZodError): string[] => {
+  const issues = new Set<string>();
 
-  if (!/^\d+$/.test(rawValue) || !Number.isInteger(port) || port < 1 || port > 65535) {
-    issues.push('PORT deve ser um número inteiro entre 1 e 65535');
+  for (const issue of error.issues) {
+    if (issue.path[0] === 'PORT') {
+      issues.add('PORT deve ser um número inteiro entre 1 e 65535');
+    }
+    if (issue.path[0] === 'NODE_ENV') {
+      issues.add(`NODE_ENV deve ser um destes valores: ${NODE_ENV_VALUES.join(', ')}`);
+    }
   }
 
-  return port;
-};
-
-const parseNodeEnvironment = (value: string | undefined, issues: string[]): NodeEnvironment | null => {
-  const nodeEnv = value ?? 'development';
-
-  if (!NODE_ENV_VALUES.includes(nodeEnv as NodeEnvironment)) {
-    issues.push(`NODE_ENV deve ser um destes valores: ${NODE_ENV_VALUES.join(', ')}`);
-    return null;
-  }
-
-  return nodeEnv as NodeEnvironment;
+  return [...issues];
 };

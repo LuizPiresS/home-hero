@@ -59,4 +59,23 @@ describe('cadastro e autenticação', () => {
     expect(duplicate.status).toBe(409);
     expect(invalidToken.status).toBe(401);
   });
+
+  it('rejeita payloads de autenticação fora do schema', async () => {
+    const app = createApp();
+
+    const invalidRegister = await request(app).post('/auth/register').send({
+      email: 'email-invalido',
+      password: 'curta',
+      roles: ['admin'],
+    });
+    const invalidLogin = await request(app).post('/auth/login').send({ email: 'email-invalido' });
+    const invalidVerification = await request(app).post('/auth/verify-email').send({ token: '' });
+
+    expect(invalidRegister.status).toBe(400);
+    expect(invalidRegister.body.error).toBe('INVALID_INPUT');
+    expect(invalidLogin.status).toBe(401);
+    expect(invalidLogin.body.error).toBe('INVALID_CREDENTIALS');
+    expect(invalidVerification.status).toBe(401);
+    expect(invalidVerification.body.error).toBe('INVALID_VERIFICATION_TOKEN');
+  });
 });
