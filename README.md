@@ -43,6 +43,7 @@ Os adaptadores atuais de usuários e sessão são em memória para permitir o de
 
 - Node.js 20 ou superior
 - npm
+- PostgreSQL 15 ou superior
 
 ## Instalação e execução
 
@@ -50,6 +51,13 @@ Os adaptadores atuais de usuários e sessão são em memória para permitir o de
 npm install
 cp .env.example .env
 npm run dev
+```
+
+Crie o banco e aplique a migration antes de iniciar a API:
+
+```bash
+createdb home_hero
+psql "$DATABASE_URL" -f migrations/001_create_users.sql
 ```
 
 Por padrão, o servidor escuta na porta `3000`. A porta pode ser alterada com `PORT`.
@@ -62,6 +70,9 @@ Variáveis suportadas:
 | --- | --- | --- | --- |
 | `PORT` | Não | inteiro entre `1` e `65535` | `3000` |
 | `NODE_ENV` | Não | `development`, `test` ou `production` | `development` |
+| `DATABASE_URL` | Sim | URL válida do PostgreSQL | — |
+
+O servidor testa a conexão com o PostgreSQL usando `SELECT 1` antes de abrir a porta HTTP. Se a URL for inválida ou o banco estiver indisponível, a plataforma não sobe.
 
 Para executar a versão compilada:
 
@@ -211,11 +222,11 @@ src/
 ├── modules/auth/
 │   ├── domain/                 # entidades e regras de usuário
 │   ├── application/            # casos de uso e portas
-│   └── adapters/               # adaptadores em memória e HTTP
+│   └── adapters/               # PostgreSQL, memória e HTTP
 └── shared/                     # componentes compartilhados
 ```
 
-Dependências externas devem ser acessadas por portas da aplicação. Isso permite trocar os adaptadores em memória por implementações reais sem acoplar as regras de negócio ao Express, banco ou provedor.
+Dependências externas devem ser acessadas por portas da aplicação. O servidor usa `PostgresUserRepository`; os adaptadores em memória continuam disponíveis para testes automatizados. Isso permite trocar detalhes de infraestrutura sem acoplar as regras de negócio ao Express ou ao PostgreSQL.
 
 ## Domínio planejado
 

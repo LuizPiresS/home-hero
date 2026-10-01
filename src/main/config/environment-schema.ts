@@ -11,7 +11,11 @@ const isValidPort = (value: string): boolean => {
 export const environmentSchema = z.object({
   PORT: z.string().default('3000').refine(isValidPort),
   NODE_ENV: z.enum(NODE_ENV_VALUES).default('development'),
-}).passthrough().transform(({ PORT, NODE_ENV }) => ({
+  DATABASE_URL: z.string().url().refine(
+    (value) => value.startsWith('postgres://') || value.startsWith('postgresql://'),
+  ),
+}).passthrough().transform(({ PORT, NODE_ENV, DATABASE_URL }) => ({
   port: Number(PORT),
   nodeEnv: NODE_ENV,
+  databaseUrl: DATABASE_URL,
 }));

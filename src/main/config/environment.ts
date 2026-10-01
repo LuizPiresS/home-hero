@@ -8,6 +8,7 @@ export type NodeEnvironment = (typeof NODE_ENV_VALUES)[number];
 export type AppEnvironment = {
   port: number;
   nodeEnv: NodeEnvironment;
+  databaseUrl: string;
 };
 
 export class EnvironmentConfigError extends Error {
@@ -36,6 +37,9 @@ const toEnvironmentIssues = (error: ZodError): string[] => {
     }
     if (issue.path[0] === 'NODE_ENV') {
       issues.add(`NODE_ENV deve ser um destes valores: ${NODE_ENV_VALUES.join(', ')}`);
+    }
+    if (issue.path[0] === 'DATABASE_URL') {
+      issues.add('DATABASE_URL deve ser uma URL válida do PostgreSQL');
     }
   }
 
