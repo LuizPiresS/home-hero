@@ -191,7 +191,7 @@ Payload:
 }
 ```
 
-Antes da confirmação do e-mail, a API responde com `403` e `EMAIL_NOT_VERIFIED`. Depois da confirmação, responde com o token de acesso e os dados básicos do usuário:
+Antes da confirmação do e-mail, com e-mail inexistente ou com senha incorreta, a API responde de forma indistinguível com `401` e `INVALID_CREDENTIALS`. Isso evita revelar a existência ou o estado de uma conta por enumeração de e-mails. Depois da confirmação, responde com o token de acesso e os dados básicos do usuário:
 
 ```json
 {

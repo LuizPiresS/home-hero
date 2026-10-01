@@ -29,8 +29,12 @@ describe('cadastro e autenticação', () => {
     await request(app).post('/auth/register').send({ email: 'user@example.com', password: 'senha-segura', roles: ['contratante'] });
     const response = await request(app).post('/auth/login').send({ email: 'user@example.com', password: 'senha-segura' });
 
-    expect(response.status).toBe(403);
-    expect(response.body.error).toBe('EMAIL_NOT_VERIFIED');
+    const wrongPassword = await request(app).post('/auth/login').send({ email: 'user@example.com', password: 'senha-incorreta' });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ error: 'INVALID_CREDENTIALS', message: 'e-mail ou senha inválidos' });
+    expect(wrongPassword.status).toBe(response.status);
+    expect(wrongPassword.body).toEqual(response.body);
   });
 
   it('confirma o e-mail e permite o login', async () => {

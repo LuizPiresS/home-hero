@@ -17,7 +17,7 @@ export const createLoginUser = (dependencies: {
     throw new AuthError('INVALID_CREDENTIALS', 'e-mail ou senha inválidos');
   }
   if (!user.emailVerifiedAt) {
-    throw new AuthError('EMAIL_NOT_VERIFIED', 'valide o e-mail antes do primeiro login');
+    throw new AuthError('INVALID_CREDENTIALS', 'e-mail ou senha inválidos');
   }
 
   return {
