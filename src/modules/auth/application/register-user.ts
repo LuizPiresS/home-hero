@@ -7,17 +7,11 @@ import type {
   TokenGenerator,
   UserRepository,
 } from './ports.js';
-import type { User, UserRole } from '../domain/user.js';
+import type { User } from '../domain/user.js';
 import { registerUserSchema } from './schemas.js';
+import type { RegisterUserInputDto, RegisterUserOutputDto } from './dtos.js';
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
-
-export type RegisterUserOutput = {
-  id: string;
-  email: string;
-  roles: UserRole[];
-  emailVerified: false;
-};
 
 export const createRegisterUser = (dependencies: {
   userRepository: UserRepository;
@@ -25,7 +19,7 @@ export const createRegisterUser = (dependencies: {
   tokenGenerator: TokenGenerator;
   emailVerificationSender: EmailVerificationSender;
   clock: Clock;
-}) => async (input: unknown): Promise<RegisterUserOutput> => {
+}) => async (input: RegisterUserInputDto): Promise<RegisterUserOutputDto> => {
   // Validar o payload aqui protege o caso de uso mesmo quando ele é chamado sem HTTP.
   const parsed = registerUserSchema.safeParse(input);
   if (!parsed.success) {

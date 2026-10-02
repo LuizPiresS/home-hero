@@ -2,11 +2,12 @@ import { AuthError } from './errors.js';
 import { hashVerificationToken } from './register-user.js';
 import type { Clock, UserRepository } from './ports.js';
 import { verifyEmailSchema } from './schemas.js';
+import type { VerifyEmailOutputDto } from './dtos.js';
 
 export const createVerifyEmail = (dependencies: {
   userRepository: UserRepository;
   clock: Clock;
-}) => async (token: unknown): Promise<{ email: string; emailVerified: true }> => {
+}) => async (token: unknown): Promise<VerifyEmailOutputDto> => {
   // O token bruto só existe durante a confirmação; a busca usa seu hash persistido.
   const parsed = verifyEmailSchema.safeParse(token);
   if (!parsed.success) {

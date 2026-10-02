@@ -1,12 +1,13 @@
 import { AuthError } from './errors.js';
 import type { AccessTokenIssuer, PasswordHasher, UserRepository } from './ports.js';
 import { loginUserSchema } from './schemas.js';
+import type { LoginUserInputDto, LoginUserOutputDto } from './dtos.js';
 
 export const createLoginUser = (dependencies: {
   userRepository: UserRepository;
   passwordHasher: PasswordHasher;
   accessTokenIssuer: AccessTokenIssuer;
-}) => async (input: { email: unknown; password: unknown }) => {
+}) => async (input: LoginUserInputDto): Promise<LoginUserOutputDto> => {
   // O schema também é aplicado fora do controller para manter o caso de uso seguro e reutilizável.
   const parsed = loginUserSchema.safeParse(input);
   if (!parsed.success) {
